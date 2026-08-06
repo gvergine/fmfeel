@@ -3,6 +3,15 @@ plugins {
     // development. We do NOT ship its JVM start scripts (see below) — the
     // deliverable is a self-contained native executable built with jpackage.
     application
+
+    // Adds the JavaFX modules to the compile/runtime classpath and wires the
+    // required --module-path / --add-modules args into the `run` task.
+    alias(libs.plugins.javafx)
+}
+
+javafx {
+    version = "21.0.4"
+    modules("javafx.controls", "javafx.fxml")
 }
 
 repositories {
@@ -13,7 +22,9 @@ repositories {
 dependencies {
     // Depend on the sibling jsm library.
     implementation(project(":jsm"))
-
+    // Depend on the sibling device library.
+    implementation(project(":device"))
+    
     // Use JUnit Jupiter for testing.
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -43,6 +54,19 @@ listOf("startScripts", "distZip", "distTar", "installDist", "assembleDist").forE
     tasks.named(it) { enabled = false }
 }
 
+// This is a non-modular application, so jpackage sets the app-image classpath
+// to the main jar only. Record every runtime dependency (JavaFX included) in
+// the main jar's manifest Class-Path so they resolve at launch — the staging
+// step below places them all as siblings of the main jar, hence bare names.
+tasks.named<Jar>("jar") {
+    manifest {
+        attributes(
+            "Class-Path" to configurations.runtimeClasspath.get()
+                .joinToString(" ") { it.name }
+        )
+    }
+}
+
 // Stage the application jar plus its runtime dependencies into one directory
 // for jpackage to consume as its --input.
 val jpackageInputDir = layout.buildDirectory.dir("jpackage-input")
@@ -54,9 +78,10 @@ val stageForJpackage = tasks.register<Copy>("stageForJpackage") {
 
 val jpackageOutputDir = layout.buildDirectory.dir("jpackage")
 
-// Build a self-contained native executable with a bundled, jlink-trimmed
-// runtime. Produces build/jpackage/fmfeel/  (fmfeel.exe on Windows,
-// bin/fmfeel on Linux) — no JVM required on the target machine.
+// Build a self-contained native executable with a bundled runtime and the
+// platform-specific JavaFX jars (native libs are bundled inside those jars and
+// extracted at launch). Produces build/jpackage/fmfeel/  (fmfeel.exe on
+// Windows, bin/fmfeel on Linux) — no JVM required on the target machine.
 tasks.register<Exec>("jpackage") {
     group = "distribution"
     description = "Builds a self-contained native executable with a bundled runtime."

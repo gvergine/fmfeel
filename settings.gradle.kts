@@ -13,3 +13,4 @@ plugins {
 rootProject.name = "keystone"
 include("jsm")
 include("fmfeel")
+include("device")

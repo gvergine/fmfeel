@@ -2,7 +2,7 @@ package jsm;
 
 import java.util.Queue;
 
-public class StateMachineRunner
+public class StateMachineRunner implements EventDispatcher
 {
 	private final StateMachineRunnable runnable;
 	private final Thread thread;
@@ -28,6 +28,7 @@ public class StateMachineRunner
 		thread.join();
 	}
 	
+	@Override
 	public Queue<Event> getEventQueue()
 	{
 		return runnable.getEventQueue();

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.effect.BoxBlur?>
+<?import javafx.scene.effect.Light.Distant?>
+<?import javafx.scene.effect.Lighting?>
+<?import javafx.scene.effect.Shadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.Rectangle?>
+
+<VBox alignment="CENTER" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fmfeel.MainController">
+	<children>
+      <StackPane onMouseDragged="#paneDragged" onMousePressed="#panePressed">
+         <children>
+            <ImageView fitHeight="150.0" fitWidth="640.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@tuner.png" />
+               </image>
+            </ImageView>
+            <Rectangle fx:id="dial" arcHeight="5.0" arcWidth="5.0" fill="#ff1f1f" height="96.0" opacity="0.71" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0" width="3.0">
+               <effect>
+                  <BoxBlur height="0.0" width="3.04" />
+               </effect>
+            </Rectangle>
+            <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="2.0">
+               <children>
+                  <Circle fx:id="minimizeButton" fill="#ffca1f" radius="5.0" stroke="BLACK" strokeType="INSIDE">
+                     <effect>
+                        <Lighting>
+                           <bumpInput>
+                              <Shadow />
+                           </bumpInput>
+                           <light>
+                              <Light.Distant />
+                           </light>
+                        </Lighting>
+                     </effect>
+                  </Circle>
+                  <Circle fx:id="closeButton" fill="#ff381f" radius="5.0" stroke="BLACK" strokeType="INSIDE">
+                     <effect>
+                        <Lighting>
+                           <bumpInput>
+                              <Shadow />
+                           </bumpInput>
+                           <light>
+                              <Light.Distant />
+                           </light>
+                        </Lighting>
+                     </effect>
+                  </Circle>
+               </children>
+               <padding>
+                  <Insets bottom="2.0" left="2.0" right="2.0" top="1.0" />
+               </padding>
+            </HBox>
+         </children>
+      </StackPane>
+	</children>
+</VBox>
