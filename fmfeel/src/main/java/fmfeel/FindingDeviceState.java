@@ -1,6 +1,7 @@
 package fmfeel;
 
 
+import javafx.application.Platform;
 import jsm.Event;
 
 public class FindingDeviceState extends StateBase
@@ -14,6 +15,9 @@ public class FindingDeviceState extends StateBase
 	@Override
 	public void onEnter()
 	{
+		Platform.runLater(() -> {
+			context.guiController.display("...searching device...");
+		});
 		context.deviceController.start();
 	}
 

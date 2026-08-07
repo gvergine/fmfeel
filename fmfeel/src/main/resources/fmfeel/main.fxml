@@ -1,69 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.effect.BoxBlur?>
 <?import javafx.scene.effect.Light.Distant?>
 <?import javafx.scene.effect.Lighting?>
 <?import javafx.scene.effect.Shadow?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fmfeel.MainController">
-	<children>
-      <StackPane onMouseDragged="#paneDragged" onMousePressed="#panePressed">
+<StackPane onMouseDragged="#paneDragged" onMousePressed="#panePressed" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fmfeel.MainController">
+   <children>
+      <ImageView fitWidth="640.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@fmfeel_tuner.png" />
+         </image>
+      </ImageView>
+      <AnchorPane>
          <children>
-            <ImageView fitWidth="640.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@tuner.png" />
-               </image>
-            </ImageView>
-            <Pane>
-               <children>
-                  <Rectangle fx:id="dial" arcHeight="5.0" arcWidth="5.0" fill="#ff1f1f" height="96.0" layoutY="22.0" opacity="0.71" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0" width="3.0">
-                     <effect>
-                        <BoxBlur height="0.0" width="3.04" />
-                     </effect>
-                  </Rectangle>
-               </children>
-            </Pane>
-            <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="2.0">
-               <children>
-                  <Circle fx:id="minimizeButton" fill="#ffca1f" radius="5.0" stroke="BLACK" strokeType="INSIDE">
-                     <effect>
-                        <Lighting>
-                           <bumpInput>
-                              <Shadow />
-                           </bumpInput>
-                           <light>
-                              <Light.Distant />
-                           </light>
-                        </Lighting>
-                     </effect>
-                  </Circle>
-                  <Circle fx:id="closeButton" fill="#ff381f" radius="5.0" stroke="BLACK" strokeType="INSIDE">
-                     <effect>
-                        <Lighting>
-                           <bumpInput>
-                              <Shadow />
-                           </bumpInput>
-                           <light>
-                              <Light.Distant />
-                           </light>
-                        </Lighting>
-                     </effect>
-                  </Circle>
-               </children>
-               <padding>
-                  <Insets bottom="2.0" left="2.0" right="2.0" top="1.0" />
-               </padding>
-            </HBox>
+            <Label fx:id="label" alignment="CENTER" contentDisplay="CENTER" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
+               <font>
+                  <Font name="Space Grotesk Regular" size="13.0" />
+               </font>
+            </Label>
+            <ProgressBar fx:id="volume" progress="0.5" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" />
          </children>
-      </StackPane>
-	</children>
-</VBox>
+      </AnchorPane>
+      <Pane style="-fx-background-color: transparent;">
+         <children>
+            <Rectangle fx:id="dial" arcHeight="5.0" arcWidth="5.0" fill="#ff1f1f" height="50.0" layoutY="55.0" opacity="0.71" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0" width="3.0">
+               <effect>
+                  <BoxBlur height="0.0" width="3.04" />
+               </effect>
+            </Rectangle>
+         </children>
+      </Pane>
+      <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="2.0" style="-fx-background-color: transparent;">
+         <children>
+            <Circle fx:id="minimizeButton" fill="#ffca1f" radius="5.0" stroke="BLACK" strokeType="INSIDE">
+               <effect>
+                  <Lighting>
+                     <bumpInput>
+                        <Shadow />
+                     </bumpInput>
+                     <light>
+                        <Light.Distant />
+                     </light>
+                  </Lighting>
+               </effect>
+            </Circle>
+            <Circle fx:id="closeButton" fill="#ff381f" radius="5.0" stroke="BLACK" strokeType="INSIDE">
+               <effect>
+                  <Lighting>
+                     <bumpInput>
+                        <Shadow />
+                     </bumpInput>
+                     <light>
+                        <Light.Distant />
+                     </light>
+                  </Lighting>
+               </effect>
+            </Circle>
+         </children>
+         <padding>
+            <Insets bottom="2.0" left="2.0" right="2.0" top="1.0" />
+         </padding>
+         <StackPane.margin>
+            <Insets right="15.0" top="10.0" />
+         </StackPane.margin>
+      </HBox>
+   </children>
+</StackPane>

@@ -262,7 +262,7 @@ public class SerialLink {
 
     /** Validates and delivers a message. Returns false (after stopping) if it is not allowed. */
     private boolean deliver(String msg) {
-    	System.out.println("received " + msg);
+
         if (!allowed.contains(msg)) {
             stop(StopReason.DISALLOWED_MESSAGE);
             return false;

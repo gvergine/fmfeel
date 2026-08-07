@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import device.DisplayHelper;
+import javafx.application.Platform;
 import jsm.Event;
 
 public class StandbyState extends StateBase
@@ -20,6 +21,9 @@ public class StandbyState extends StateBase
 	@Override
 	public void onEnter()
 	{
+		Platform.runLater(() -> {
+			context.guiController.display("STANDBY");
+		});
 		context.clockThread = new Thread(() -> {
 			while (true)
 			{

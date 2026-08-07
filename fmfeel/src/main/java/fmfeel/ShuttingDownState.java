@@ -3,6 +3,7 @@ package fmfeel;
 
 import java.io.IOException;
 
+import javafx.application.Platform;
 import jsm.Event;
 
 public class ShuttingDownState extends StateBase
@@ -16,6 +17,9 @@ public class ShuttingDownState extends StateBase
 	@Override
 	public void onEnter()
 	{
+		Platform.runLater(() -> {
+			context.guiController.display("shutting down...");
+		});
 		context.runner.stop();
 		context.deviceController.stop();
 		try

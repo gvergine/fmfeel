@@ -3,7 +3,6 @@ package fmfeel;
 import java.util.Map;
 
 import device.DisplayHelper;
-import fmfeel.Persistency.Config;
 import javafx.application.Platform;
 import jsm.Event;
 
@@ -19,35 +18,51 @@ public class RunningState extends StateBase
 	public void onEnter()
 	{
 		context.tuner.setCurrentFrequency(context.persistency.getConfig().frequency);
-		
+		context.volume.setCurrentVolume(context.persistency.getConfig().volume);
+
 
 		Map<Integer, String> stations = context.persistency.getConfig().stations;
 		int freq = context.tuner.getCurrentFrequency();
-		
+
 		String url = stations.getOrDefault(freq, null);
 		context.radioPlayer = new RadioPlayer(url, new RadioPlayer.Listener() {
-			
+
 			@Override
 			public void onTitle(String title) {
 
 			}
-			
+
 			@Override
 			public void onStationName(String name) {
-				context.deviceController.display(1, DisplayHelper.center(name,16));						
+				context.deviceController.display(1, DisplayHelper.center(name,16));
+
+				Platform.runLater(() -> {
+					context.guiController.display(name);
+				});
 			}
 		});
 		int vol = context.volume.getCurrentVolume();
 		context.radioPlayer.setStationVolume(vol / 30.0);
-		if (url != null) context.radioPlayer.setNoiseVolume(0);
-		else context.radioPlayer.setNoiseVolume(0.1);
+		if (url != null) {
+			context.radioPlayer.setNoiseVolume(0);
+			Platform.runLater(() -> {
+				context.guiController.display("...");
+			});
+		}
+		else {
+			context.radioPlayer.setNoiseVolume(0.1);
+			Platform.runLater(() -> {
+				context.guiController.display("");
+			});
+		}
 		context.radioPlayer.play();
 
 
-		
+
 		Platform.runLater(() -> {
 			context.guiController.moveTunerDial(context.tuner.getCurrentFrequency());
 			context.guiController.showTunerDial();
+			context.guiController.displayVolume(vol / 30.0);
 		});
 		context.deviceController.display(0, DisplayHelper.center(
 				String.format("FM %.2f", context.tuner.getCurrentFrequencyMhz()),
@@ -62,6 +77,7 @@ public class RunningState extends StateBase
 		context.radioPlayer = null;
 		Platform.runLater(() -> {
 			context.guiController.hideTunerDial();
+			context.guiController.hideVolume();
 		});
 		context.deviceController.display(0, "");
 		context.deviceController.display(1, "");
@@ -88,21 +104,32 @@ public class RunningState extends StateBase
 			handleVolume(false);
 		}
 	}
-	
+
 	private void handleTune(boolean up) // false is down
 	{
 		context.tuner.tune(up? 1 : -1);
-		
+
 		Map<Integer, String> stations = context.persistency.getConfig().stations;
 		int freq = context.tuner.getCurrentFrequency();
-		
+
 		String url = stations.getOrDefault(freq, null);
 
-		if (url != null) context.radioPlayer.setNoiseVolume(0);
-		else context.radioPlayer.setNoiseVolume(0.1);
+		if (url != null) {
+			context.radioPlayer.setNoiseVolume(0);
+			Platform.runLater(() -> {
+				context.guiController.display("...");
+			});
+		}
+		else
+		{
+			context.radioPlayer.setNoiseVolume(0.1);
+			Platform.runLater(() -> {
+				context.guiController.display("");
+			});
+		}
 		context.radioPlayer.setUrl(url);
 
-		
+
 		context.persistency.getConfig().frequency = context.tuner.getCurrentFrequency();
 		context.deviceController.display(0, DisplayHelper.center(
 				String.format("FM %.2f", context.tuner.getCurrentFrequencyMhz()),
@@ -113,21 +140,25 @@ public class RunningState extends StateBase
 			context.guiController.moveTunerDial(context.tuner.getCurrentFrequency());
 		});	
 	}
-	
+
 	private void handleVolume(boolean up) // false is down
 	{
 		context.volume.changeVolume(up ? 1 : -1);
-		
+
 		int vol = context.volume.getCurrentVolume();
-		
+
 		context.radioPlayer.setStationVolume(vol / 30.0);
-		
-		
+
+
 		context.persistency.getConfig().volume = vol;
-		
-	//	int normalizedVolForDisplay = (int)(vol / 30.0 * 12.0);
-		
-	//	context.deviceController.display(1, "VOL: " + "*".repeat(normalizedVolForDisplay) );
+		Platform.runLater(() -> {
+			context.guiController.displayVolume(vol / 30.0);
+		});	
+
+
+		//	int normalizedVolForDisplay = (int)(vol / 30.0 * 12.0);
+
+		//	context.deviceController.display(1, "VOL: " + "*".repeat(normalizedVolForDisplay) );
 
 	}
 
