@@ -1,5 +1,7 @@
 package device;
 
+import java.util.function.Consumer;
+
 import jsm.Logger;
 import jsm.State;
 import jsm.StateMachine;
@@ -13,6 +15,9 @@ public class DeviceController
 
 
 	private final Context context = new Context();
+	
+	private String[] display_line = {"",""};
+	
 
 	final StateMachineRunner runner;
 
@@ -59,4 +64,34 @@ public class DeviceController
 		runner.join();
 	}
 	
+	public void send(String message)
+	{
+		context.serialLink.send(message);
+	}
+
+	public void setOnDeviceConnected(Runnable onDeviceConnectedRunnable)
+	{
+		context.onDeviceConnectedRunnable = onDeviceConnectedRunnable;
+	}
+	
+	public void setOnDeviceDisconnected(Runnable onDeviceDisconnectedRunnable)
+	{
+		context.onDeviceDisconnectedRunnable = onDeviceDisconnectedRunnable;
+	}
+	
+	public void setOnMessage(Consumer<String> onMessageConsumer)
+	{
+		context.onMessageConsumer = onMessageConsumer;
+	}
+	
+	public void display(int line, String text)
+	{
+		if (line != 0 && line != 1) return;
+
+		if (text.compareTo(display_line[line]) != 0)
+		{
+			display_line[line] = text;
+			send("SHOW " + line + " " + text);
+		}
+	}
 }

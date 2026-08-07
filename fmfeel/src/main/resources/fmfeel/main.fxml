@@ -8,6 +8,7 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
@@ -17,16 +18,20 @@
 	<children>
       <StackPane onMouseDragged="#paneDragged" onMousePressed="#panePressed">
          <children>
-            <ImageView fitHeight="150.0" fitWidth="640.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitWidth="640.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@tuner.png" />
                </image>
             </ImageView>
-            <Rectangle fx:id="dial" arcHeight="5.0" arcWidth="5.0" fill="#ff1f1f" height="96.0" opacity="0.71" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0" width="3.0">
-               <effect>
-                  <BoxBlur height="0.0" width="3.04" />
-               </effect>
-            </Rectangle>
+            <Pane>
+               <children>
+                  <Rectangle fx:id="dial" arcHeight="5.0" arcWidth="5.0" fill="#ff1f1f" height="96.0" layoutY="22.0" opacity="0.71" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0" width="3.0">
+                     <effect>
+                        <BoxBlur height="0.0" width="3.04" />
+                     </effect>
+                  </Rectangle>
+               </children>
+            </Pane>
             <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="2.0">
                <children>
                   <Circle fx:id="minimizeButton" fill="#ffca1f" radius="5.0" stroke="BLACK" strokeType="INSIDE">

@@ -1,18 +1,19 @@
 package fmfeel;
 
+import javafx.animation.Interpolator;
+import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 /**
  * Controller backing {@code main.fxml}.
  */
-public class MainController
+public class MainController implements RadioGUIController
 {
 	@FXML
 	private Rectangle dial;
@@ -30,6 +31,7 @@ public class MainController
 		closeButton.setOnMouseClicked(event -> {
 		    ((Stage)((Circle)event.getSource()).getScene().getWindow()).close();
 		});
+		hideTunerDial();
 	}
 
     private class Delta
@@ -50,4 +52,28 @@ public class MainController
         stage.setX(delta.x+me.getScreenX());
         stage.setY(delta.y+me.getScreenY());
     }
+
+	@Override
+	public void showTunerDial() {
+		dial.setVisible(true);
+	}
+
+	@Override
+	public void hideTunerDial() {
+		dial.setVisible(false);		
+	}
+
+	private static final double left_boundary = 81.5;
+	private static final double right_boundary = 598.5;
+	private static final double tuner_width = right_boundary - left_boundary;
+	private static final double width_per_tuner_unit = tuner_width / (Tuner.MAX_FREQ - Tuner.MIN_FREQ);
+	
+
+	@Override
+	public void moveTunerDial(int tuner_units)
+    {
+		dial.setX(left_boundary + (tuner_units - Tuner.MIN_FREQ) * width_per_tuner_unit);
+		System.out.println(String.format("tu=%d mhz=%.2f px=%.2f", tuner_units, tuner_units * 0.05, dial.getX()));
+	}
+	
 }

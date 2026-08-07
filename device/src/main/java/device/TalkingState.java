@@ -1,11 +1,13 @@
 package device;
 
+
 import com.fazecast.jSerialComm.SerialPort;
 
 import jsm.Event;
 
 public class TalkingState extends StateBase
 {
+	
 
 	public TalkingState(Context context) {
 		super("talking", context);
@@ -17,8 +19,16 @@ public class TalkingState extends StateBase
 		SerialPort p = context.serialPorts[context.probingIndex];
 		
 		context.serialLink = new SerialLink(p);
+		context.serialLink.setOnStop(t -> {
+			context.eventDispatcher.getEventQueue().offer(Event.build("connection_error"));
+		});
+		
+		context.serialLink.removeListener(context.onMessageConsumer);
+		context.serialLink.addListener(context.onMessageConsumer);
 		
 		context.serialLink.start();
+		
+		context.onDeviceConnectedRunnable.run();
 		
 
 	}
@@ -26,7 +36,9 @@ public class TalkingState extends StateBase
 	@Override
 	public void onExit()
 	{
+		context.serialLink.removeListener(context.onMessageConsumer);
 		context.serialLink.stop();
+		context.onDeviceDisconnectedRunnable.run();
 
 	}
 

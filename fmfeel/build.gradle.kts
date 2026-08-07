@@ -24,6 +24,8 @@ dependencies {
     implementation(project(":jsm"))
     // Depend on the sibling device library.
     implementation(project(":device"))
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
+    implementation("org.freedesktop.gstreamer:gst1-java-core:1.4.0")
     
     // Use JUnit Jupiter for testing.
     testImplementation(libs.junit.jupiter)
@@ -98,13 +100,17 @@ tasks.register<Exec>("jpackage") {
     // jpackage refuses to overwrite an existing app image.
     doFirst { delete(jpackageOutputDir) }
 
-    commandLine(
-        jpackageExe.absolutePath,
-        "--type", "app-image",
-        "--name", "fmfeel",
-        "--input", jpackageInputDir.get().asFile.absolutePath,
-        "--main-jar", mainJar.get(),
-        "--main-class", "fmfeel.Main",
-        "--dest", jpackageOutputDir.get().asFile.absolutePath,
-    )
+	val iconName = if (isWindows) "fmfeel.ico" else "fmfeel.png"
+	val iconFile = layout.projectDirectory.file("src/main/packaging/$iconName")
+	
+	commandLine(
+	    jpackageExe.absolutePath,
+	    "--type", "app-image",
+	    "--name", "fmfeel",
+	    "--input", jpackageInputDir.get().asFile.absolutePath,
+	    "--main-jar", mainJar.get(),
+	    "--main-class", "fmfeel.Main",
+	    "--icon", iconFile.asFile.absolutePath,
+	    "--dest", jpackageOutputDir.get().asFile.absolutePath,
+	)
 }

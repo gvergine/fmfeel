@@ -4,6 +4,7 @@ import device.DeviceController;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
+import jsm.Event;
 import jsm.Logger;
 import jsm.State;
 import jsm.StateMachine;
@@ -22,25 +23,75 @@ public class Main
 
 	public static void main(String[] args) throws InterruptedException
 	{
-		
+		final Context context = new Context();
 		final State initialState = State.build("initial", logger);
-		final State findingDeviceState = State.build("findingDevice", logger);
-		final State runningState = State.build("running", logger);
-		final State shuttingDownState = State.build("shuttingDown", logger);
+		final State findingDeviceState = new FindingDeviceState(context);
+		final State standbyState = new StandbyState(context);
+		final State runningState = new RunningState(context);
+		final State shuttingDownState = new ShuttingDownState(context);
 		
 		final StateMachine machine = new StateMachine(initialState, logger);
 
 		machine.addTransition(initialState, "gui_start", findingDeviceState);
-		machine.addTransition(findingDeviceState, "device_found", runningState);
+		machine.addTransition(findingDeviceState, "device_connected", standbyState);
+		machine.addTransition(findingDeviceState, "shutdown_request", shuttingDownState);
+		machine.addTransition(standbyState, "toggle_power", runningState);
+		machine.addTransition(standbyState, "device_disconnected", findingDeviceState);
+		machine.addTransition(standbyState, "shutdown_request", shuttingDownState);
+		machine.addTransition(runningState, "toggle_power", standbyState);
+		machine.addTransition(runningState, "tune_up", null);
+		machine.addTransition(runningState, "tune_down", null);
+		machine.addTransition(runningState, "volume_up", null);
+		machine.addTransition(runningState, "volume_down", null);
 		machine.addTransition(runningState, "device_disconnected", findingDeviceState);
 		machine.addTransition(runningState, "shutdown_request", shuttingDownState);
-		machine.addTransition(findingDeviceState, "shutdown_request", shuttingDownState);
 
 		
 		machine.validate();
 		
 		final StateMachineRunnable runnable = new StateMachineRunnable(machine, true, logger);
 		final StateMachineRunner runner = new StateMachineRunner(runnable,"fmfeel-runner");
+		context.eventDispatcher = runner;
+		context.runner = runner;
+		context.tuner = new Tuner();
+		context.volume = new Volume();
+		context.persistency = new Persistency();
+		context.deviceController = new DeviceController();
+		context.deviceController.setOnDeviceConnected(() -> {
+			context.eventDispatcher.getEventQueue().offer(Event.build("device_connected"));
+		});
+		context.deviceController.setOnDeviceDisconnected(() -> {
+			context.eventDispatcher.getEventQueue().offer(Event.build("device_disconnected"));
+		});
+		context.deviceController.setOnMessage(message -> {
+			if (message.compareTo("HB") == 0) return;
+			if (message.compareTo("ENCODER LEFT CW") == 0) {
+				context.eventDispatcher.getEventQueue().offer(Event.build("tune_up"));
+				return;
+			};
+			if (message.compareTo("ENCODER LEFT CCW") == 0) {
+				context.eventDispatcher.getEventQueue().offer(Event.build("tune_down"));
+				return;
+			};
+			if (message.compareTo("LEFT BUTTON DOWN") == 0) {
+				context.eventDispatcher.getEventQueue().offer(Event.build("toggle_power"));
+				return;
+			};
+			if (message.compareTo("LEFT BUTTON UP") == 0) return;
+			if (message.compareTo("ENCODER RIGHT CW") == 0) {
+				context.eventDispatcher.getEventQueue().offer(Event.build("volume_up"));
+				return;
+			};
+			if (message.compareTo("ENCODER RIGHT CCW") == 0) {
+				context.eventDispatcher.getEventQueue().offer(Event.build("volume_down"));
+				return;
+			};
+			if (message.compareTo("RIGHT BUTTON DOWN") == 0) return;
+			if (message.compareTo("RIGHT BUTTON UP") == 0) return;
+			
+			logger.log("unkown message from device: " + message);
+			
+		});
 		
 		runner.start();
 		
@@ -49,9 +100,11 @@ public class Main
             // runs on the JavaFX Application Thread
             try {
                 Stage stage = new Stage();
-                stage.setOnHidden(e -> runner.stop());
+                stage.setOnHidden(e -> {
+            		context.eventDispatcher.getEventQueue().offer(Event.build("shutdown_request"));
+                });
 
-				new HelloApp(runner).start(stage);
+				new HelloApp(context).start(stage); 
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
